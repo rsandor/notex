@@ -1,17 +1,17 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
 
-var exists = require('101/exists');
 var notex = require('./lib/notex.js');
 
-if (exists(window)) {
+/* jshint ignore:start */
+if (typeof window !== 'undefined' && typeof window !== null) {
   window.notex = notex;
 }
 else {
   module.exports = notex;
 }
-
-},{"./lib/notex.js":2,"101/exists":4}],2:[function(require,module,exports){
+/* jshint ignore:end */
+},{"./lib/notex.js":2}],2:[function(require,module,exports){
 'use strict';
 
 /**
@@ -22,6 +22,11 @@ else {
  */
 var parse = require('./parser.js').parse;
 
+/**
+ * Traverses an abstract syntax tree and outputs the results to the console.
+ * @param  {Object} ast Current ast node.
+ * @param  {Number} [depth] Current depth of the traversal.
+ */
 function traverse(ast, depth) {
   depth = depth || 0;
 
@@ -971,21 +976,4 @@ module.exports = (function() {
     parse:       parse
   };
 })();
-},{}],4:[function(require,module,exports){
-/**
- * @module {function} 101/exists
- * @type {function}
- */
-
-/**
- * Returns false for null and undefined, true for everything else.
- * @function module:101/exists
- * @param val {*} - value to be existance checked
- * @return {boolean} whether the value exists or not
- */
-module.exports = exists;
-
-function exists (val) {
-  return val !== undefined && val !== null;
-}
 },{}]},{},[1]);
