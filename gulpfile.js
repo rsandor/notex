@@ -33,12 +33,12 @@ var browserified = transform(function(filename) {
 });
 
 /**
- * Compiles all pegjs grammars in `grammar` and places the resulting
- * javascript into the `lib/` directory.
+ * Compiles `grammar.pegjs` and places the resulting
+ * parser into `lib/parser.js`.
  */
 gulp.task('peg', function() {
   var pegError = debug('notex:build:peg');
-  return gulp.src('./grammar/*.pegjs')
+  return gulp.src('./grammar.pegjs')
     .pipe(peg().on('error', function(err) {
       pegError(err);
       process.exit(1);
