@@ -29,7 +29,7 @@ gulp.task('peg', function() {
         pegError(err);
         process.exit(1);
       }))
-      .pipe(rename({ basename: 'grammar' }))
+      .pipe(rename({ basename: 'parser' }))
       .pipe(gulp.dest(dir.lib));
 });
 

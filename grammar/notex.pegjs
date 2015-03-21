@@ -5,10 +5,10 @@
    */
 }
 start
-  = exprList:exprList {
+  = list:exprList {
     return {
       type: 'root',
-      exprList: exprList
+      list: list
     };
   }
 
@@ -20,8 +20,11 @@ exprList "List of expressions"
   }
 
 expr "Single expression"
-  = "{" _ expr:expr _ "}" {
-    return expr;
+  = "{" _ list:exprList _ "}" {
+    return {
+      type: 'group',
+      list: list
+    };
   }
   / _ '(' _ list:exprList _ ')' _ {
     return {
@@ -42,7 +45,7 @@ expr "Single expression"
     };
   }
   / esc command:id {
-    return { type: 'command', command: command };
+    return { type: 'command', name: command };
   }
   / name:id {
     return { type: 'id', name: name };
