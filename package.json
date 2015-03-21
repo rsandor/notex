@@ -1,0 +1,11 @@
+{
+  "name": "notex",
+  "version": "0.0.1",
+  "description": "LaTeX Inspired Mathematical Typesetting for the Web.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Ryan Sandor Richards <sandor.richards@gmail.com>",
+  "license": "MIT"
+}
