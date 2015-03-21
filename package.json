@@ -4,8 +4,19 @@
   "description": "LaTeX Inspired Mathematical Typesetting for the Web.",
   "main": "index.js",
   "scripts": {
+    "build": "./node_modules/.bin/gulp build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Ryan Sandor Richards <sandor.richards@gmail.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "browserify": "^9.0.3",
+    "gulp": "^3.8.11",
+    "gulp-minify-css": "^1.0.0",
+    "gulp-rename": "^1.2.0",
+    "gulp-sourcemaps": "^1.5.1",
+    "gulp-uglify": "^1.1.0",
+    "jsdoc": "^3.3.0-beta3",
+    "vinyl-transform": "^1.0.0"
+  }
 }
