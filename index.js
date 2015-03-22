@@ -1,12 +1,13 @@
 'use strict';
 
 var notex = require('./lib/notex.js');
+var exists = require('101/exists');
 
 /* jshint ignore:start */
-if (typeof window !== 'undefined' && typeof window !== null) {
+if (exists(window)) {
   window.notex = notex;
 }
-else {
+else if (exists(module)) {
   module.exports = notex;
 }
 /* jshint ignore:end */

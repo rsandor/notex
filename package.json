@@ -3,9 +3,9 @@
   "version": "0.0.2",
   "description": "LaTeX Inspired Mathematical Typesetting for the Web.",
   "main": "index.js",
-  "repository" : {
-    "type" : "git",
-    "url" : "http://github.com/rsandor/notex.git"
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/rsandor/notex.git"
   },
   "scripts": {
     "build": "DEBUG=notex:* ./node_modules/.bin/gulp lint && ./node_modules/.bin/gulp build",
@@ -28,6 +28,7 @@
     "gulp-rename": "^1.2.0",
     "gulp-sourcemaps": "^1.5.1",
     "gulp-uglify": "^1.1.0",
+    "gulp-watch": "^4.2.0",
     "jsdoc": "^3.3.0-beta3",
     "jshint": "^2.6.3",
     "jshint-stylish": "^1.0.1",
@@ -35,5 +36,6 @@
     "vinyl-transform": "^1.0.0"
   },
   "dependencies": {
+    "101": "^0.14.0"
   }
 }

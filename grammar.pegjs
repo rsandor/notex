@@ -45,6 +45,13 @@ expr "Single expression"
       expr: expr
     };
   }
+  / esc "frac" _ "{" _ numerator:exprList _ "}" _ "{" _ denominator:exprList _ "}" {
+    return {
+      type: 'frac',
+      numerator: numerator,
+      denominator: denominator
+    };
+  }
   / esc command:id {
     return { type: 'command', name: command };
   }
