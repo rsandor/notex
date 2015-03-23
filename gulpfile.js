@@ -77,27 +77,33 @@ gulp.task('js', ['peg'], function() {
     .pipe(gulp.dest(dir.js));
 });
 
-// gulp.task('css', function() {
-//   return gulp.src('./css/mathed.css')
-//     .pipe(gulp.dest('./dist/css/'))
-//     .pipe(minifyCSS())
-//     .pipe(rename({ extname: '.min.css' }))
-//     .pipe(gulp.dest('./dist/css/'));
-// });
+/**
+ * Compiles and minifies the css for the project.
+ */
+gulp.task('css', function() {
+  return gulp.src('./css/notex.css')
+    .pipe(gulp.dest('./dist/css/'))
+    .pipe(minifyCSS())
+    .pipe(rename({ extname: '.min.css' }))
+    .pipe(gulp.dest('./dist/css/'));
+});
 
-// gulp.task('fonts', function() {
-//   var sources = [
-//     './fonts/*.eot',
-//     './fonts/*.svg',
-//     './fonts/*.ttf',
-//     './fonts/*.woff'
-//   ];
-//   return gulp.src(sources).pipe(gulp.dest('./dist/fonts/'));
-// });
+/**
+ * Compiles fonts for the project.
+ */
+gulp.task('fonts', function() {
+  var sources = [
+    './fonts/*.eot',
+    './fonts/*.svg',
+    './fonts/*.ttf',
+    './fonts/*.woff'
+  ];
+  return gulp.src(sources).pipe(gulp.dest('./dist/fonts/'));
+});
 
 /**
  * Master build task. Build the javascript, css, etc.
  * for the project and packages it into the `dist/`
  * directory.
  */
-gulp.task('build', ['js']);
+gulp.task('build', ['fonts', 'css', 'js']);

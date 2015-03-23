@@ -24,25 +24,33 @@ var commands = {};
 /**
  * Greek letters.
  */
-var greek = [
-  'Alpha', 'Beta', 'Gamma', 'Delta', 'Epsilon', 'Zeta', 'Eta', 'Theta', 'Iota',
-  'Kappa', 'Lambda', 'Mu', 'Nu', 'Xi', 'Omicron', 'Pi', 'Rho', 'Sigma', 'Tau',
-  'Upsilon', 'Phi', 'Chi', 'Psi', 'Omega', 'alpha', 'beta', 'gamma', 'delta',
-  'epsilon', 'zeta', 'eta', 'theta', 'iota', 'kappa', 'lambda', 'mu', 'nu', 'xi',
-  'omicron',  'pi', 'rho', 'sigma', 'tau', 'upsilon', 'phi', 'chi', 'psi', 'omega'
+var lowerGreek = [
+  'alpha', 'beta', 'gamma', 'delta', 'epsilon', 'zeta', 'eta',
+  'theta', 'iota', 'kappa', 'lambda', 'mu', 'nu', 'xi', 'omicron',
+  'pi', 'rho', 'sigma', 'tau', 'upsilon', 'phi', 'chi', 'psi', 'omega'
 ];
 
-greek.forEach(function(name) {
+lowerGreek.forEach(function(name) {
   commands[name] = function() {
     return '<em>&' + name + ';</em>';
   };
+
+  var capital = name.substr(0, 1).toUpperCase() + name.substr(1);
+  commands[capital] = function() {
+    return '&' + capital + ';';
+  };
 });
+
 
 /**
  * Commands the map to a specific html escape sequence.
  */
 var mapToSequence = {
-  'pm': '&plusmn;'
+  'pm': '&plusmn;',
+  'cup': ' &#x22c3; ',
+  'cap': ' &#x22c2; ',
+  'in': ' &#8712; ',
+  'notin': ' &#8713; '
 };
 
 var mapToSequenceKeys = [];
@@ -149,7 +157,8 @@ renderer.type('root', function(node, recur) {
   if (!Array.isArray(node.list)) {
     return '';
   }
-  return recur.each(node.list).trim();
+  var html = recur.each(node.list).trim();
+  return '<span class="notex">' + html + '</span>';
 });
 
 renderer.type('group', function (node, recur) {
