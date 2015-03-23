@@ -30,7 +30,7 @@ expr "Single expression"
   / _ '(' _ list:exprList _ ')' _ {
     return {
       type: 'paren',
-      exprList: list
+      list: list
     };
   }
   / _ sup _ expr:expr {

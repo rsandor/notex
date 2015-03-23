@@ -24,17 +24,19 @@ var commands = {};
 /**
  * Greek letters.
  */
-var lowerGreek = [
+var greek = [
   'alpha', 'beta', 'gamma', 'delta', 'epsilon', 'zeta', 'eta',
   'theta', 'iota', 'kappa', 'lambda', 'mu', 'nu', 'xi', 'omicron',
   'pi', 'rho', 'sigma', 'tau', 'upsilon', 'phi', 'chi', 'psi', 'omega'
 ];
 
-lowerGreek.forEach(function(name) {
+greek.forEach(function(name) {
+  // Lower case greek letters should be italic
   commands[name] = function() {
     return '<em>&' + name + ';</em>';
   };
 
+  // Capital letters should not be italic
   var capital = name.substr(0, 1).toUpperCase() + name.substr(1);
   commands[capital] = function() {
     return '&' + capital + ';';
@@ -297,7 +299,7 @@ module.exports = (function() {
         peg$c15 = function(list) {
             return {
               type: 'paren',
-              exprList: list
+              list: list
             };
           },
         peg$c16 = function(expr) {
