@@ -43,10 +43,7 @@ function log(msg, depth) {
  * @type {[type]}
  */
 var logger = traversal()
-  .recurAfter(
-    'list',
-    'expr'
-  )
+  .recurAfter('list', 'expr')
   .handle(function (node, recur, depth) {
     var msg = node.type;
     if (node.value) {
@@ -56,9 +53,9 @@ var logger = traversal()
   })
   .type('frac', function (node, recur, depth) {
     log('Frac', depth);
-    log('  Numerator', depth);
+    log('Numerator', depth + 1);
     recur.each(node.numerator, depth+2);
-    log('  Denominator:', depth);
+    log('Denominator:', depth + 1);
     recur.each(node.denominator, depth+2);
   });
 
@@ -1119,7 +1116,7 @@ var debug = require('debug');
 var warning = debug('notex:traversal:warning');
 
 /**
- * Structure for representing "stream-style" tree traversals.
+ * Helper class for defining tree traversals.
  * @author Ryan Sandor Richards
  */
 function TreeTraversal() {
