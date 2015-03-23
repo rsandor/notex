@@ -1,6 +1,6 @@
 {
   "name": "notex",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "LaTeX Inspired Mathematical Typesetting for the Web.",
   "main": "index.js",
   "repository": {
