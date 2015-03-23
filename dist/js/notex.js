@@ -40,24 +40,28 @@ function log(msg, depth) {
 
 /**
  * Traversal that logs node types and values.
- * @type {[type]}
+ * @type {TreeTraversal}
  */
 var logger = traversal()
-  .recurAfter('list', 'expr')
-  .handle(function (node, recur, depth) {
+  .visit(function (node, recur, depth) {
     var msg = node.type;
     if (node.value) {
       msg += ' -> ' + node.value;
     }
     log(msg, depth);
   })
-  .type('frac', function (node, recur, depth) {
-    log('Frac', depth);
-    log('Numerator', depth + 1);
-    recur.each(node.numerator, depth+2);
-    log('Denominator:', depth + 1);
-    recur.each(node.denominator, depth+2);
-  });
+  .preorder('list', 'expr');
+
+/**
+ * Special visitor for `'frac'` type nodes.
+ */
+logger.property('type', 'frac', function (node, recur, depth) {
+  log('Frac', depth);
+  log('Numerator', depth + 1);
+  recur.each(node.numerator, depth+2);
+  log('Denominator:', depth + 1);
+  recur.each(node.denominator, depth+2);
+});
 
 /**
  * Traverses a tree starting with the given node and
@@ -1120,43 +1124,46 @@ var warning = debug('notex:traversal:warning');
  * @author Ryan Sandor Richards
  */
 function TreeTraversal() {
-  this.handlers = {};
-  this.defaultHandler = function() {};
-  this.recurBeforeNames = [];
-  this.recurAfterNames = [];
+  this.visitors = {};
+  this.visitor = function() {};
+  this.preorderProperties = [];
+  this.postorderProperties = [];
 }
 
 // Private methods
 
 /**
- * Finds a handler for the given node.
- * @param  {Object} node Node for which to find the handler.
- * @return {TreeTraversal~handler} The handler for the node
- *  or the default handler if no specific handler was found.
+ * Given a traversal and a node, this method find the appropriate
+ * visitor for the node.
+ * @param {TreeTraversal} traversal Traversal the contains the
+ *  visitor.
+ * @param  {Object} node Node for which to find the visitor.
+ * @return {TreeTraversal~visitorCallback} The visitor for the node
+ *  or the default visitor if no, more specific, one could be found.
  */
-function findHandler(traversal, node) {
-  var handler = traversal.defaultHandler;
-  for (var propertyName in traversal.handlers) {
+function findVisitor(traversal, node) {
+  var visitor = traversal.visitor;
+  for (var propertyName in traversal.visitors) {
     if (!node.hasOwnProperty(propertyName)) {
       continue;
     }
     var value = node[propertyName];
-    var propertyHandler = traversal.handlers[propertyName][value];
+    var propertyHandler = traversal.visitors[propertyName][value];
     if (exists(propertyHandler)) {
-      handler = propertyHandler;
+      visitor = propertyHandler;
       break;
     }
   }
-  return handler;
+  return visitor;
 }
 
 /**
- * Builds a recur callback for a given node at a given depth.
+ * Builds a recursive traversal callback for a given node at a given depth.
  * @param {Object} parent Parent node of the recur.
  * @param {Number} depth Depth of the parent node.
  * @return {TreeTraversal~recur} The recur method for the node and depth.
  */
-function makeRecur(traversal, parent, depth) {
+function makeRecurCallback(traversal, parent, depth) {
   var recur = function(node, givenDepth) {
     if (!givenDepth) {
       givenDepth = depth + 1;
@@ -1209,60 +1216,72 @@ function allToSet(set, values) {
 // Public methods
 
 /**
- * Adds a traversal handler for a given node key and values.
- * The traversal will apply the handler for a node only if
- * the node has a property name (`key`) that equals the given
- * value (`value`).
+ * Defines a new visitor that only applies to nodes that have a given
+ * property set to the given value. If `node` is the node currently
+ * being visited in the traversal, then this will only apply if
+ * `node[property] === value`.
  *
  * @example
- * // Add a handler for all `node.type === 'number'`
- * traversal().addHandler('type', 'number', function(node, recur) {
+ * // Add a visitor for all `node.type === 'number'`
+ * traversal().property('type', 'number', function(node, recur) {
  *  // Do something with the `node` and possibly `recur` on its
  *  // children.
  * });
  *
- * @param {string} key Key associated with the handler.
- * @param {string} value Value required to run the handler.
- * @param {TreeTraversal~handler} handler Function that handles
- *  the traversal at a node which has the given property
- *  equal to the given value.
+ * @param {string} key Key the node must have.
+ * @param {string} value Value the node must have at the given key.
+ * @param {TreeTraversal~visitorCallback} visitor Visitor callback
+ *  to apply when `node[key] === value`.
  * @return {TreeTraversal} This tree traversal (for chaining).
  */
-TreeTraversal.prototype.addHandler = function(key, value, handler) {
-  if (!exists(this.handlers[key])) {
-    this.handlers[key] = {};
+TreeTraversal.prototype.property = function(key, value, visitor) {
+  if (!exists(this.visitors[key])) {
+    this.visitors[key] = {};
   }
-  this.handlers[key][value] = handler;
+  this.visitors[key][value] = visitor;
   return this;
 };
 
 /**
- * Sets the default handler for the traversal.
- * @param  {TreeTraversal~handler} handler Default handler to set.
+ * Sets the default visitor for the traversal.
+ * @param  {TreeTraversal~visitorCallback} visitor Default visitor to set.
  * @return {TreeTraversal} This tree traversal (for chaining).
  */
-TreeTraversal.prototype.handle = function(handler) {
-  this.defaultHandler = handler;
+TreeTraversal.prototype.visit = function(visitor) {
+  this.visitor = visitor;
   return this;
 };
 
 /**
  * Adds a node property name helper to the traversal.
+ *
+ * @example
+ * // Create a couple property helpers for the traversal
+ * var myTraversal = traversal()
+ *  .addPropertyHelper('name')
+ *  .addPropertyHelper('coolness')
+ * // Use it to quickly handle special cases
+ * myTraversal
+ *  .name('ryan', function() { console.log('Ryan found'); })
+ *  .name('ryan', function() { console.log('Airiel found'); })
+ *  .name('nallely', function() { console.log('Nallely found'); })
+ *  .coolness('totally', function() { console.log('Totally cool'); })
+ *
  * @param {string} Property name helper to add.
  * @see {@link traverse} for usage via the factory method.
  */
-TreeTraversal.prototype.addHelper = function(propertyName) {
+TreeTraversal.prototype.addPropertyHelper = function(propertyName) {
   if (exists(this[propertyName])) {
     warning('Cannot create helper "' + propertyName + '", method already exists.');
     return;
   }
-  this[propertyName] = function(value, handler) {
-    return this.addHandler(propertyName, value, handler);
+  this[propertyName] = function(value, visitor) {
+    return this.addHandler(propertyName, value, visitor);
   };
 };
 
 /**
- * Helper method for registering handlers on the `type` property.
+ * Helper method for registering visitors on the `type` property.
  *
  * @example
  * // Handles nodes such that `node.type === 'group'`.
@@ -1271,46 +1290,39 @@ TreeTraversal.prototype.addHelper = function(propertyName) {
  * });
  *
  * @param  {string} type Value of the type to match against `node.type`.
- * @param  {TreeTraversal~handler} handler Hander for the given node type.
+ * @param  {TreeTraversal~visitor} visitor Visitor closure for
+ *  nodes of the given type.
  * @return {TreeTraversal} This tree traversal (for chaining).
  */
-TreeTraversal.prototype.type = function(type, handler) {
-  return this.addHandler('type', type, handler);
+TreeTraversal.prototype.type = function(type, visitor) {
+  return this.property('type', type, visitor);
 };
 
 /**
- * Set node properties that should be automatcally traversed
- * before handling node.
- * @param {...(string|string[])} propertyName Names of the
- *  properties that, given they exist, should be treated as
- *  nodes and automatically traversed.
+ * Adds node property names to the traversal that should
+ * be recursively traversed *after* the node has been visited.
+ * @param {...(string|string[])} propertyName Node property
+ *  names that, if exist, should be automatically traversed.
  * @return {TreeTraversal} This tree traversal (for chaining).
  */
-TreeTraversal.prototype.recurBefore = function() {
+TreeTraversal.prototype.preorder = function() {
   var names = Array.prototype.slice.call(arguments);
-  allToSet(this.recurBeforeNames, names);
+  allToSet(this.preorderProperties, names);
   return this;
 };
 
 /**
- * Set node properties that should be automatically traversed
- * after handling a node.
- * @param {...(string|string[])} propertyName Names of the
- *  properties that, given they exist, should be treated as
- *  nodes and automatically traversed.
+ * Adds node property names to the traversal that should
+ * be recursively traversed *before* the node has been visited.
+ * @param {...(string|string[])} propertyName Node property
+ *  names that, if exist, should be automatically traversed.
  * @return {TreeTraversal} This tree traversal (for chaining).
  */
-TreeTraversal.prototype.recurAfter = function() {
+TreeTraversal.prototype.postorder = function() {
   var names = Array.prototype.slice.call(arguments);
-  allToSet(this.recurAfterNames, names);
+  allToSet(this.postorderProperties, names);
   return this;
 };
-
-/**
- * Alias for `recurAfter`.
- * @see  {@link recurAfter}
- */
-TreeTraversal.prototype.recurOn = TreeTraversal.prototype.recurAfter;
 
 /**
  * Perform the traversal on a given node.
@@ -1321,20 +1333,20 @@ TreeTraversal.prototype.walk = function(node, depth) {
   if (!depth) {
     depth = 0;
   }
-  var handler = findHandler(this, node);
-  var recur = makeRecur(this, node, depth);
+  var visitor = findVisitor(this, node);
+  var recur = makeRecurCallback(this, node, depth);
 
   // TODO Going to need a way to turn this off as a special case.
-  this.recurBeforeNames.forEach(function(name) {
+  this.postorderProperties.forEach(function(name) {
     if (exists(node[name])) {
       recur(node[name], depth);
     }
   });
 
-  var result = handler.call(this, node, recur, depth);
+  var result = visitor.call(this, node, recur, depth);
 
   if (recur.performAutoTraversal) {
-    this.recurAfterNames.forEach(function(name) {
+    this.preorderProperties.forEach(function(name) {
       if (exists(node[name])) {
         if (Array.isArray(node[name])) {
           recur.each(node[name], depth+1);
@@ -1351,7 +1363,13 @@ TreeTraversal.prototype.walk = function(node, depth) {
 
 /**
  * Alias for `walk`.
- * @see  {@link recurAfter}
+ * @see  {@link walk}
+ */
+TreeTraversal.prototype.traverse = TreeTraversal.prototype.walk;
+
+/**
+ * Alias for `walk`.
+ * @see  {@link walk}
  */
 TreeTraversal.prototype.run = TreeTraversal.prototype.walk;
 
@@ -1400,7 +1418,7 @@ function traverse(helpers) {
 
 /**
  * Performs operations on a given node during a tree traversal.
- * @callback TreeTraversal~handler
+ * @callback TreeTraversal~visitorCallback
  * @param {Object} node Node currently being handled during the traversal.
  * @param {TreeTraversal~recur} recur Continues the traversal on a given node.
  * @param {Number} depth Current depth of the traversal.
@@ -1421,8 +1439,8 @@ function traverse(helpers) {
  */
 
 /**
- * Stop automatic traversal for names defined with `recurBefore`
- * and `recurAfter`.
+ * Stop automatic traversal for names defined with `preorder`
+ * and `postorder`.
  * @callback TreeTraversal~recur.stop
  */
 
