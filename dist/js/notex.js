@@ -1281,24 +1281,6 @@ TreeTraversal.prototype.addPropertyHelper = function(propertyName) {
 };
 
 /**
- * Helper method for registering visitors on the `type` property.
- *
- * @example
- * // Handles nodes such that `node.type === 'group'`.
- * traversal().type('group', function(node, recur) {
- *  // Do something for a 'group' type node...
- * });
- *
- * @param  {string} type Value of the type to match against `node.type`.
- * @param  {TreeTraversal~visitor} visitor Visitor closure for
- *  nodes of the given type.
- * @return {TreeTraversal} This tree traversal (for chaining).
- */
-TreeTraversal.prototype.type = function(type, visitor) {
-  return this.property('type', type, visitor);
-};
-
-/**
  * Adds node property names to the traversal that should
  * be recursively traversed *after* the node has been visited.
  * @param {...(string|string[])} propertyName Node property
@@ -1419,7 +1401,7 @@ function traverse(helpers) {
 /**
  * Performs operations on a given node during a tree traversal.
  * @callback TreeTraversal~visitorCallback
- * @param {Object} node Node currently being handled during the traversal.
+ * @param {Object} node Node currently being visited during the traversal.
  * @param {TreeTraversal~recur} recur Continues the traversal on a given node.
  * @param {Number} depth Current depth of the traversal.
  */
