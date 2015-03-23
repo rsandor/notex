@@ -13,6 +13,8 @@ else if (exists(module)) {
 }
 /* jshint ignore:end */
 },{"./lib/notex.js":3,"101/exists":6}],2:[function(require,module,exports){
+'use strict';
+
 /**
  * Tree traversal that logs node information. Helpful for
  * debugging changes to the parser.
@@ -41,44 +43,25 @@ function log(msg, depth) {
  * @type {[type]}
  */
 var logger = traversal()
-  .type('root', function (node, recur, depth) {
-    log('Root', depth);
-    recur.each(node.list);
-  })
-  .type('group', function (node, recur, depth) {
-    log('Group', depth);
-    recur.each(node.list);
-  })
-  .type('paren', function (node, recur, depth) {
-    log('Paren', depth);
-    recur.each(node.list);
-  })
-  .type('superscript', function (node, recur, depth) {
-    log('Superscript', depth);
-    recur(node.expr);
-  })
-  .type('subscript', function (node, recur, depth) {
-    log('Subscript', depth);
-    recur(node.expr);
+  .handle(function (node, recur, depth) {
+    // Log relevant information
+    if (!node.value) {
+      log(node.type, depth);
+    }
+    else {
+      log(node.type + ' -> "' + node.value + '"', depth);
+    }
+
+    // Handle recur
+    if (Array.isArray(node.list)) { recur.each(node.list); }
+    if (node.expr) { recur(node.expr); }
   })
   .type('frac', function (node, recur, depth) {
     log('Frac', depth);
     log('  Numerator', depth);
-    recur.each(node.numerator, depth+1);
+    recur.each(node.numerator, depth+2);
     log('  Denominator:', depth);
-    recur.each(node.denominator, depth+1);
-  })
-  .type('command', function (node, recur, depth) {
-    log('Command = ' + node.name, depth);
-  })
-  .type('id', function (node, recur, depth) {
-    log('Identifier = ' + node.name, depth);
-  })
-  .type('operator', function (node, recur, depth) {
-    log('Operator = ' + node.name, depth);
-  })
-  .type('number', function (node, recur, depth) {
-    log('Number = ' + node.number, depth);
+    recur.each(node.denominator, depth+2);
   });
 
 /**
@@ -123,7 +106,7 @@ function render(src) {
  * Module exports.
  */
 module.exports = {
-  render: render,
+  render: render
 };
 
 },{"./logger":2,"./parser":4,"./traversal":5}],4:[function(require,module,exports){
@@ -218,16 +201,16 @@ module.exports = (function() {
             };
           },
         peg$c21 = function(command) {
-            return { type: 'command', name: command };
+            return { type: 'command', value: command };
           },
         peg$c22 = function(name) {
-            return { type: 'id', name: name };
+            return { type: 'id', value: name };
           },
         peg$c23 = function(name) {
-            return { type: 'operator', name: name };
+            return { type: 'operator', value: name };
           },
         peg$c24 = function(number) {
-            return { type: 'number', number: number };
+            return { type: 'number', value: number };
           },
         peg$c25 = { type: "other", description: "Escape character ''" },
         peg$c26 = "\\",
@@ -1132,6 +1115,7 @@ module.exports = (function() {
   };
 })();
 },{}],5:[function(require,module,exports){
+'use strict';
 var exists = require('101/exists');
 var debug = require('debug');
 var warning = debug('notex:traversal:warning');
@@ -1142,7 +1126,7 @@ var warning = debug('notex:traversal:warning');
  */
 function TreeTraversal() {
   this.handlers = {};
-  this.defaultNodeHandler = function() {};
+  this.defaultHandler = function() {};
 }
 
 /**
@@ -1178,8 +1162,8 @@ TreeTraversal.prototype.addHandler = function(key, value, handler) {
  * @param  {TreeTraversal~handler} handler Default handler to set.
  * @return {TreeTraversal} This tree traversal (for chaining).
  */
-TreeTraversal.prototype.defaultHandler = function(handler) {
-  this.defaultNodeHandler = handler;
+TreeTraversal.prototype.handle = function(handler) {
+  this.defaultHandler = handler;
   return this;
 };
 
@@ -1189,11 +1173,11 @@ TreeTraversal.prototype.defaultHandler = function(handler) {
  * @see {@link traverse} for usage via the factory method.
  */
 TreeTraversal.prototype.addHelper = function(propertyName) {
-  if (exists(traversal[propertyName])) {
+  if (exists(this[propertyName])) {
     warning('Cannot create helper "' + propertyName + '", method already exists.');
     return;
   }
-  traversal[propertyName] = function(value, handler) {
+  this[propertyName] = function(value, handler) {
     return this.addHandler(propertyName, value, handler);
   };
 };
@@ -1219,17 +1203,18 @@ TreeTraversal.prototype.type = function(type, handler) {
  * Finds a handler for the given node.
  * @param  {Object} node Node for which to find the handler.
  * @return {TreeTraversal~handler} The handler for the node
- *  or `null` if no such handler was found.
+ *  or the default handler if no specific handler was found.
  */
 TreeTraversal.prototype._findHandler = function(node) {
-  var handler = null;
+  var handler = this.defaultHandler;
   for (var propertyName in this.handlers) {
     if (!node.hasOwnProperty(propertyName)) {
       continue;
     }
     var value = node[propertyName];
-    handler = this.handlers[propertyName][value];
-    if (exists(handler)) {
+    var propertyHandler = this.handlers[propertyName][value];
+    if (exists(propertyHandler)) {
+      handler = propertyHandler;
       break;
     }
   }
@@ -1271,10 +1256,8 @@ TreeTraversal.prototype.run = function(node, depth) {
     depth = 0;
   }
   var handler = this._findHandler(node);
-  if (exists(handler)) {
-    var recur = this._makeRecur(node, depth);
-    return handler.call(this, node, recur, depth);
-  }
+  var recur = this._makeRecur(node, depth);
+  return handler.call(this, node, recur, depth);
 };
 
 /**

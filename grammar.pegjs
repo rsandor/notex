@@ -53,16 +53,16 @@ expr "Single expression"
     };
   }
   / esc command:id {
-    return { type: 'command', name: command };
+    return { type: 'command', value: command };
   }
   / name:id {
-    return { type: 'id', name: name };
+    return { type: 'id', value: name };
   }
   / name:op {
-    return { type: 'operator', name: name };
+    return { type: 'operator', value: name };
   }
   / number:number {
-    return { type: 'number', number: number };
+    return { type: 'number', value: number };
   }
 
 esc "Escape character '\'"
