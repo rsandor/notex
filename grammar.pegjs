@@ -58,11 +58,11 @@ expr "Single expression"
   / name:id {
     return { type: 'id', value: name };
   }
-  / name:op {
-    return { type: 'operator', value: name };
-  }
   / number:number {
     return { type: 'number', value: number };
+  }
+  / name:op {
+    return { type: 'operator', value: name };
   }
 
 esc "Escape character '\'"
@@ -75,13 +75,13 @@ sub "Subscript character '_'"
   = "_"
 
 id "identifier"
-  = name:$([a-zA-Z][a-zA-Z0-9]*) { return name.toString(); }
+  = name:$([a-zA-Z]+) { return name.toString(); }
 
 op "operator"
   = name:$([`~!@#$%^&*\-_=+\\|;:'",<.>/?])
 
 number "decimal numbers"
-  = number:$([0-9]+)
+  = number:$([-]?[0-9]+)
 
 _ "optional whitespace"
   = [ \t\r\n]*
