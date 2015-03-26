@@ -99,4 +99,8 @@
     margin-left: -0.1em;
 }
 
+/* Shift superscripts after ids to the right by a small amount. */
+.notex-id + .notex-super {
+    padding-left: 0.1em;
+}
 
