@@ -33,9 +33,11 @@
     "jshint": "^2.6.3",
     "jshint-stylish": "^1.0.1",
     "pegjs": "^0.8.0",
+    "traversal": "^1.0.1",
     "vinyl-transform": "^1.0.0"
   },
   "dependencies": {
-    "101": "^0.14.0"
+    "101": "^0.14.0",
+    "traversal": "^1.0.1"
   }
 }

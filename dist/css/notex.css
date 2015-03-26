@@ -48,19 +48,55 @@
     font-style: italic;
 }
 
-/* Sizing Styles */
-.smaller { font-size: 50%; }
+
+/*.smaller { font-size: 50%; }
 .small { font-size: 75%; }
 .big { font-size: 120%; }
 .bigger { font-size: 180%; }
 
-/* Over-under styles */
 .ou { display: inline-block; text-align: center; vertical-align: middle; }
 .ou .m { margin: -0.23em 0 -0.13em 0; }
 .ou hr { color: black; background-color: black; height: 1px; margin: 0; padding: 0; border: none; }
-.ou .p { line-height: 1; }
+.ou .p { line-height: 1; }*/
 
-/* Use "Computer Modern Serif" for anything with the .mathed class */
+
+/* Use "Computer Modern Serif" for anything with the .notex class */
 .notex { font-family: 'Computer Modern Serif'; }
-.notex .em { font-style: italic; }
+
+.notex .notex-italic, .notex .notex-id {
+    font-style: italic;
+}
+
+.notex .notex-id {}
+
+.notex-id.notex-plain {
+    font-style: normal;
+}
+
+/* Binary operator padding */
+.notex .notex-operator {
+    padding-left: 0.2em;
+    padding-right: 0.2em;
+}
+
+/* Sequence of operator padding */
+.notex-operator + .notex-operator {
+    padding-left: 0;
+}
+
+/* Right and left paren with a little extra left padding */
+.notex-right-paren, .notex-left-paren {
+    padding-left: 0.1em;
+}
+
+/* Spacing for sequences of identifiers */
+.notex-id + .notex-id {
+    padding-left: 0.1em;
+}
+
+/* Shift subscripts for ids to the left by a small amount. */
+.notex-id + .notex-sub {
+    margin-left: -0.1em;
+}
+
 

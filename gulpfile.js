@@ -67,7 +67,7 @@ gulp.task('lint', function() {
  * `dist/js/` directory.
  */
 gulp.task('js', ['peg'], function() {
-  return gulp.src('./index.js')
+  return gulp.src('./dist.js')
     .pipe(browserified)
     .pipe(rename({ basename: 'notex' }))
     .pipe(gulp.dest(dir.js))
