@@ -64,9 +64,24 @@ expr "Single expression"
   / name:op {
     return { type: 'operator', value: name };
   }
+  / comma {
+    return { type: 'comma' };
+  }
+  / equals {
+    return { type: 'equals' };
+  }
+  / minus {
+    return { type: 'minus' };
+  }
 
 esc "Escape character '\'"
   = "\\"
+
+equals "Equals sign"
+  = "="
+
+minus "Minus operator"
+  = "-"
 
 sup "Superscript character '^'"
   = "^"
@@ -78,7 +93,10 @@ id "identifier"
   = name:$([a-zA-Z]+) { return name.toString(); }
 
 op "operator"
-  = name:$([`~!@#$%^&*\-_=+\\|;:'",<.>/?])
+  = name:$([`~!@#$%^&*\_+\\|;:'"<.>/?])
+
+comma "basic comma"
+  = ","
 
 number "decimal numbers"
   = number:$([-]?[0-9]+)

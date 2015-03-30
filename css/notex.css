@@ -75,13 +75,19 @@
 
 /* Binary operator padding */
 .notex .notex-operator {
-    padding-left: 0.2em;
-    padding-right: 0.2em;
+    padding-left: 0.3em;
+    padding-right: 0.3em;
+}
+
+/* Equals Sign */
+.notex-equals {
+    padding-left: 0.4em;
+    padding-right: 0.4em;
 }
 
 /* Sequence of operator padding */
 .notex-operator + .notex-operator {
-    padding-left: 0;
+    /*padding-left: 0;*/
 }
 
 /* Right and left paren with a little extra left padding */
@@ -104,3 +110,31 @@
     padding-left: 0.1em;
 }
 
+/* Rotates glyph by various angles. */
+.notex-rotate-90,
+.notex-rotate-180,
+.notex-rotate-270 { display: inline-block; }
+.notex-rotate-90 { transform: rotate(90deg); }
+.notex-rotate-180 { transform: rotate(180deg); }
+.notex-rotate-270 { transform: rotate(270deg); }
+
+/* Angle bracket styles */
+.notex-langle, .notex-rangle {
+    display: inline-block;
+    transform: scaleX(0.7) scaleY(1.2);
+    position: relative;
+    top: 0.2em;
+}
+
+.notex-langle {
+    margin-left: -0.6em;
+}
+
+.notex-rangle {
+    margin-right: -0.6em;
+    margin-left: 0.1em;
+}
+
+.notex-comma {
+    margin-right: 0.1em;
+}
