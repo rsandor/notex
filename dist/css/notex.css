@@ -138,3 +138,8 @@
 .notex-comma {
     margin-right: 0.1em;
 }
+
+.notex-minus {
+    transform: scaleY(0.8);
+    display: inline-block;
+}
